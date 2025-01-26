@@ -46,8 +46,7 @@ server = app.server
 
 app.layout = [
     html.Div(children='My First App with Data'),
-    dash_table.DataTable(data=df.to_dict('records'), page_size=10),
-    dash_table.DataTable(data=df1.to_dict('records'), page_size=10)
+    dash_table.DataTable(data=df.to_dict('records'), page_size=10)
 ]
 
 # app.layout = [
