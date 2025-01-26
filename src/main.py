@@ -26,27 +26,28 @@ df = pd.DataFrame(rows, columns=columns)
 
 scatter = df[df['difficulty'] > 0]
 
-app = Dash(__name__)
+app = Dash()
 
 server = app.server
 
-app.layout = [
-    html.Div(children='Personal Study Tracker Table'),
-    html.Hr(),
-    dcc.Dropdown(options=['difficulty','correct', 'date'], value='difficulty', id='controls-and-radio-item'),
-    dash_table.DataTable(data=df.to_dict('records'), page_size=5),
-    dcc.Graph(figure={}, id='controls-and-graph')]
+app.layout = html.Div([
+    html.H1('Hello World')
+])
 
-@callback(
-    Output(component_id='controls-and-graph', component_property='figure'),
-    Input(component_id='controls-and-radio-item', component_property='value')
-)
-def update_graph(col_chosen):
-    if col_chosen == "date":
-        fig = px.bar(scatter, x=col_chosen, y='question_id')
-    else:
-        fig = px.scatter(scatter, x='question_id', y=col_chosen)
-    return fig
+# app.layout = [
+    # html.Div(children='Personal Study Tracker Table'),
+    # html.Hr(),
+    # # dcc.Dropdown(options=['difficulty','correct', 'date'], value='difficulty', id='controls-and-radio-item'),
+    # dash_table.DataTable(data=df.to_dict('records'), page_size=5),
+    # dcc.Graph(figure={}, id='controls-and-graph')]
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# @callback(
+#     Output(component_id='controls-and-graph', component_property='figure'),
+#     Input(component_id='controls-and-radio-item', component_property='value')
+# )
+# def update_graph(col_chosen):
+#     if col_chosen == "date":
+#         fig = px.bar(scatter, x=col_chosen, y='question_id')
+#     else:
+#         fig = px.scatter(scatter, x='question_id', y=col_chosen)
+#     return fig
