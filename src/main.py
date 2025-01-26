@@ -28,6 +28,8 @@ scatter = df[df['difficulty'] > 0]
 
 app = Dash()
 
+server = app.server
+
 app.layout = [
     html.Div(children='Personal Study Tracker Table'),
     html.Hr(),
