@@ -22,7 +22,7 @@ rows = cur.fetchall()
 cur.close()
 conn.close()
 
-df1 = pd.DataFrame(rows, columns=columns)
+df = pd.DataFrame(rows, columns=columns)
 
 scatter = df[df['difficulty'] > 0]
 
