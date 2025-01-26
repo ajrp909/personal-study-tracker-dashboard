@@ -49,4 +49,4 @@ def update_graph(col_chosen):
     return fig
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=True)
