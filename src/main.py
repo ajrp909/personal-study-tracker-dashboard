@@ -8,9 +8,9 @@ import plotly.express as px
 
 load_dotenv()
 
-# TABLE_NAME = "question"
-# DATABASE_URL = os.environ['DATABASE_URL']
-# DB_CONN = f"{DATABASE_URL}"
+TABLE_NAME = "question"
+DATABASE_URL = os.environ['DATABASE_URL']
+DB_CONN = f"{DATABASE_URL}"
 
 # table_name = TABLE_NAME
 # query = "select * from {} order by question_id;"
