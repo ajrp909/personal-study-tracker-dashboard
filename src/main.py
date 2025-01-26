@@ -24,21 +24,7 @@ conn.close()
 
 df1 = pd.DataFrame(rows, columns=columns)
 
-# scatter = df[df['difficulty'] > 0]
-
-import pandas as pd
-
-# Define data using a dictionary
-data = {
-    'Name': ['Alice', 'Bob', 'Charlie'],
-    'Age': [24, 30, 22],
-    'City': ['New York', 'Los Angeles', 'Chicago']
-}
-
-# Create DataFrame
-df = pd.DataFrame(data)
-
-# Display the DataFrame
+scatter = df[df['difficulty'] > 0]
 
 app = Dash()
 
@@ -49,20 +35,20 @@ app.layout = [
     dash_table.DataTable(data=df.to_dict('records'), page_size=10)
 ]
 
-# app.layout = [
-    # html.Div(children='Personal Study Tracker Table'),
-    # html.Hr(),
-    # # dcc.Dropdown(options=['difficulty','correct', 'date'], value='difficulty', id='controls-and-radio-item'),
-    # dash_table.DataTable(data=df.to_dict('records'), page_size=5),
-    # dcc.Graph(figure={}, id='controls-and-graph')]
+app.layout = [
+    html.Div(children='Personal Study Tracker Table'),
+    html.Hr(),
+    dcc.Dropdown(options=['difficulty','correct', 'date'], value='difficulty', id='controls-and-radio-item'),
+    dash_table.DataTable(data=df.to_dict('records'), page_size=5),
+    dcc.Graph(figure={}, id='controls-and-graph')]
 
-# @callback(
-#     Output(component_id='controls-and-graph', component_property='figure'),
-#     Input(component_id='controls-and-radio-item', component_property='value')
-# )
-# def update_graph(col_chosen):
-#     if col_chosen == "date":
-#         fig = px.bar(scatter, x=col_chosen, y='question_id')
-#     else:
-#         fig = px.scatter(scatter, x='question_id', y=col_chosen)
-#     return fig
+@callback(
+    Output(component_id='controls-and-graph', component_property='figure'),
+    Input(component_id='controls-and-radio-item', component_property='value')
+)
+def update_graph(col_chosen):
+    if col_chosen == "date":
+        fig = px.bar(scatter, x=col_chosen, y='question_id')
+    else:
+        fig = px.scatter(scatter, x='question_id', y=col_chosen)
+    return fig
