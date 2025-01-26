@@ -4,7 +4,8 @@ import psycopg2
 from psycopg2 import sql
 import pandas as pd
 from dotenv import load_dotenv
-from dash import Dash, html, dash_table
+from dash import Dash, html, dash_table, dcc, callback, Output, Input
+import plotly.express as px
 
 load_dotenv()
 
@@ -24,11 +25,27 @@ conn.close()
 
 df = pd.DataFrame(rows, columns=columns)
 
+scatter = df[df['difficulty'] > 0]
+
 app = Dash()
 
 app.layout = [
     html.Div(children='Personal Study Tracker Table'),
-    dash_table.DataTable(data=df.to_dict('records'), page_size=25)]
+    html.Hr(),
+    dcc.Dropdown(options=['difficulty','correct', 'date'], value='difficulty', id='controls-and-radio-item'),
+    dash_table.DataTable(data=df.to_dict('records'), page_size=5),
+    dcc.Graph(figure={}, id='controls-and-graph')]
+
+@callback(
+    Output(component_id='controls-and-graph', component_property='figure'),
+    Input(component_id='controls-and-radio-item', component_property='value')
+)
+def update_graph(col_chosen):
+    if col_chosen == "date":
+        fig = px.bar(scatter, x=col_chosen, y='question_id')
+    else:
+        fig = px.scatter(scatter, x='question_id', y=col_chosen)
+    return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
