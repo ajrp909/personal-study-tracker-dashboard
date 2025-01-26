@@ -1,8 +1,10 @@
 import os
+import dash
 import psycopg2
 from psycopg2 import sql
 import pandas as pd
 from dotenv import load_dotenv
+from dash import Dash, html, dash_table
 
 load_dotenv()
 
@@ -22,4 +24,11 @@ conn.close()
 
 df = pd.DataFrame(rows, columns=columns)
 
-print
+app = Dash()
+
+app.layout = [
+    html.Div(children='Personal Study Tracker Table'),
+    dash_table.DataTable(data=df.to_dict('records'), page_size=25)]
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
