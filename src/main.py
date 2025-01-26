@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from dash import Dash, html, dash_table, dcc, callback, Output, Input
 import plotly.express as px
 
-# load_dotenv()
+load_dotenv()
 
 # TABLE_NAME = "question"
 # DATABASE_URL = os.environ['DATABASE_URL']
