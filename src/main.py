@@ -12,17 +12,17 @@ TABLE_NAME = "question"
 DATABASE_URL = os.environ['DATABASE_URL']
 DB_CONN = f"{DATABASE_URL}"
 
-# table_name = TABLE_NAME
-# query = "select * from {} order by question_id;"
-# conn = psycopg2.connect(DB_CONN)
-# cur = conn.cursor()
-# cur.execute(sql.SQL(query).format(sql.Identifier(table_name)))
-# columns = [column[0] for column in cur.description]
-# rows = cur.fetchall()
-# cur.close()
-# conn.close()
+table_name = TABLE_NAME
+query = "select * from {} order by question_id;"
+conn = psycopg2.connect(DB_CONN)
+cur = conn.cursor()
+cur.execute(sql.SQL(query).format(sql.Identifier(table_name)))
+columns = [column[0] for column in cur.description]
+rows = cur.fetchall()
+cur.close()
+conn.close()
 
-# df = pd.DataFrame(rows, columns=columns)
+df1 = pd.DataFrame(rows, columns=columns)
 
 # scatter = df[df['difficulty'] > 0]
 
@@ -46,7 +46,8 @@ server = app.server
 
 app.layout = [
     html.Div(children='My First App with Data'),
-    dash_table.DataTable(data=df.to_dict('records'), page_size=10)
+    dash_table.DataTable(data=df.to_dict('records'), page_size=10),
+    dash_table.DataTable(data=df1.to_dict('records'), page_size=10)
 ]
 
 # app.layout = [
