@@ -26,7 +26,9 @@ df = pd.DataFrame(rows, columns=columns)
 
 scatter = df[df['difficulty'] > 0]
 
-app = Dash()
+app = Dash(__name__)
+
+server = app.server
 
 app.layout = [
     html.Div(children='Personal Study Tracker Table'),
