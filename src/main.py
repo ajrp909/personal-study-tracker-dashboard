@@ -6,6 +6,10 @@ from dotenv import load_dotenv
 from dash import Dash, html, dash_table, dcc, callback, Output, Input
 import plotly.express as px
 
+app = Dash()
+
+server = app.server
+
 load_dotenv()
 
 TABLE_NAME = "question"
@@ -25,10 +29,6 @@ conn.close()
 df = pd.DataFrame(rows, columns=columns)
 
 scatter = df[df['difficulty'] > 0]
-
-app = Dash()
-
-server = app.server
 
 app.layout = [
     html.Div(children='My First App with Data'),
@@ -52,3 +52,6 @@ def update_graph(col_chosen):
     else:
         fig = px.scatter(scatter, x='question_id', y=col_chosen)
     return fig
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
