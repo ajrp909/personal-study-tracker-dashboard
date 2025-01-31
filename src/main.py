@@ -29,7 +29,7 @@ app = Dash()
 server = app.server
 
 app.layout = [
-    html.Div(children='Personal Study Tracker Table'),
+    html.H1(children='Personal Study Tracker Table'),
     html.Hr(),
     dcc.Dropdown(options=['difficulty','correct', 'date'], value='difficulty', id='controls-and-radio-item'),
     dash_table.DataTable(id='table', data=fetch_data().to_dict('records'), page_size=5),
@@ -45,12 +45,18 @@ app.layout = [
 def update(col_chosen, n):
     df = fetch_data()
 
-    scatter = df[df['difficulty'] > 0]
+    df = df[df['difficulty'] > 0]
+
+    difficulty_count = df.groupby('difficulty').size().reset_index(name='count')
+
+    date_count = df.groupby('date').size().reset_index(name='count')
 
     if col_chosen == "date":
-        fig = px.bar(scatter, x=col_chosen, y='question_id')
-    else:
-        fig = px.scatter(scatter, x='question_id', y=col_chosen)
+        fig = px.line(date_count, x=col_chosen, y='count')
+    if col_chosen == "difficulty":
+        fig = px.bar(difficulty_count, x=col_chosen, y='count')
+    if col_chosen == "correct":
+        fig = px.pie(df, values='question_id', names=col_chosen)
     return fig, df.to_dict('records')
 
 if __name__ == '__main__':
