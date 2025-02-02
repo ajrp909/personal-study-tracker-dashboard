@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import psycopg2
 from psycopg2 import sql
 import pandas as pd
@@ -57,18 +57,18 @@ def update(col_chosen, n):
         questions_done = date_count['count'].sum()
         questions_remaining = 500 - questions_done
         daily_avg_needed = questions_remaining / days_remaining
-        fig = px.scatter(date_count, x='date', y='count', 
-                         title=f'Exam date: {EXAM_DATE.strftime("%d/%m/%Y")}.\n'
-                         f'Exam countdown: {days_remaining} days left.\n'
-                         f'Questions done: {questions_done}.\n'
-                         f'Questions remaining: {questions_remaining}.')
-        fig.add_vline(x=EXAM_DATE, line_color='red', line_width=2)
+        fig = px.scatter(date_count, x='date', y='count',
+                         title=f'Countdown: {days_remaining} days.\n'
+                         f'Questions: {questions_done} done, {questions_remaining} left.')
+        fig.add_vline(x=EXAM_DATE, line_color='red', line_width=3)
         fig.add_vrect(x0="2025-05-23", x1=str(EXAM_DATE), 
               annotation_text="2 weeks to go", annotation_position="top left",
               fillcolor="green", opacity=0.25, line_width=0)
         fig.add_hline(y=daily_avg_needed, line_dash='dash', line_color='green', 
                       annotation_text=f'Avg. Questions Needed per day: {daily_avg_needed:.2f}', 
                       annotation_position='bottom left')
+        fig.update_layout(xaxis=dict(range=[datetime.strptime('2025-01-01', '%Y-%m-%d'), EXAM_DATE + timedelta(hours=6)]),
+                          yaxis=dict(range=[0,None]))
     if col_chosen == "difficulty":
         difficulty_count = df[df['difficulty'] > 0].groupby('difficulty').size().reset_index(name='count')
         fig = px.bar(difficulty_count, x='difficulty', y='count', title='Difficulty of Question')
