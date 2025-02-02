@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 import psycopg2
 from psycopg2 import sql
 import pandas as pd
@@ -11,6 +12,7 @@ load_dotenv()
 TABLE_NAME = "question"
 DATABASE_URL = os.environ['DATABASE_URL']
 DB_CONN = f"{DATABASE_URL}"
+EXAM_DATE = datetime.strptime('2025-06-05', '%Y-%m-%d')
 
 def fetch_data():
     table_name = TABLE_NAME
@@ -28,36 +30,55 @@ app = Dash()
 
 server = app.server
 
-app.layout = [
+app.layout = html.Div([
     html.H1(children='Personal Study Tracker Table'),
     html.Hr(),
-    dcc.Dropdown(options=['difficulty','correct', 'date'], value='difficulty', id='controls-and-radio-item'),
-    dash_table.DataTable(id='table', data=fetch_data().to_dict('records'), page_size=5),
-    dcc.Graph(figure={}, id='controls-and-graph'),
-    dcc.Interval(id='interval-component', interval=60*1000, n_intervals=0)]
+    dcc.Dropdown(options=['date', 'difficulty', 'correct'], value='date', id='dropdown'),
+    dash_table.DataTable(id='table', data=[], page_size=5),
+    dcc.Graph(figure={}, id='graph'),
+    dcc.Interval(id='interval', interval=60*1000, n_intervals=0)
+])
 
 @callback(
-    Output(component_id='controls-and-graph', component_property='figure'),
+    Output(component_id='graph', component_property='figure'),
     Output(component_id='table', component_property='data'),
-    Input(component_id='controls-and-radio-item', component_property='value'),
-    Input(component_id='interval-component', component_property='n_intervals')
+    Input(component_id='dropdown', component_property='value'),
+    Input(component_id='interval', component_property='n_intervals')
 )
 def update(col_chosen, n):
     df = fetch_data()
 
-    df = df[df['difficulty'] > 0]
-
-    difficulty_count = df.groupby('difficulty').size().reset_index(name='count')
-
-    date_count = df.groupby('date').size().reset_index(name='count')
+    table_data = df.to_dict('records')
 
     if col_chosen == "date":
-        fig = px.line(date_count, x=col_chosen, y='count')
+        date_count = df.groupby('date').size().reset_index(name='count')
+        today = datetime.now()
+        days_remaining = (EXAM_DATE - today).days
+        questions_done = date_count['count'].sum()
+        questions_remaining = 500 - questions_done
+        daily_avg_needed = questions_remaining / days_remaining
+        fig = px.scatter(date_count, x='date', y='count', 
+                         title=f'Exam date: {EXAM_DATE.strftime("%d/%m/%Y")}.\n'
+                         f'Exam countdown: {days_remaining} days left.\n'
+                         f'Questions done: {questions_done}.\n'
+                         f'Questions remaining: {questions_remaining}.')
+        fig.add_vline(x=EXAM_DATE, line_color='red', line_width=2)
+        fig.add_vrect(x0="2025-05-23", x1=str(EXAM_DATE), 
+              annotation_text="2 weeks to go", annotation_position="top left",
+              fillcolor="green", opacity=0.25, line_width=0)
+        fig.add_hline(y=daily_avg_needed, line_dash='dash', line_color='green', 
+                      annotation_text=f'Avg. Questions Needed per day: {daily_avg_needed:.2f}', 
+                      annotation_position='bottom left')
     if col_chosen == "difficulty":
-        fig = px.bar(difficulty_count, x=col_chosen, y='count')
+        difficulty_count = df[df['difficulty'] > 0].groupby('difficulty').size().reset_index(name='count')
+        fig = px.bar(difficulty_count, x='difficulty', y='count', title='Difficulty of Question')
+        fig.update_traces(width=0.95)
     if col_chosen == "correct":
-        fig = px.pie(df, values='question_id', names=col_chosen)
-    return fig, df.to_dict('records')
+        correct_count = df['correct'].value_counts().reset_index()
+        correct_count.columns = ['correct', 'count']
+        fig = px.pie(correct_count, values='count', names='correct', title='Proportion of Correct Answers')
+
+    return fig, table_data
 
 if __name__ == '__main__':
     app.run_server(debug=True)
